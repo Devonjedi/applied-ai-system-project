@@ -1,113 +1,114 @@
-# Playlist Chaos
+# SignalFlow Music Recommender
 
-Your AI assistant tried to build a smart playlist generator. The app runs, but some of the behavior is unpredictable. Your task is to explore the app, investigate the code, and use an AI assistant to debug and improve it.
+`SignalFlow Music Recommender` is a retrieval-augmented music recommendation app built in Streamlit. A user can describe what they want to hear in plain language, the system retrieves the closest songs from a local catalog, and the app returns grounded recommendations with transparent reasons and evaluation results.
 
-This activity is your first chance to practice AI-assisted debugging on a codebase that is slightly messy, slightly mysterious, and intentionally imperfect.
+This project builds on my original `Playlist Chaos` project from Modules 1-3. The earlier version grouped songs into mood-based playlists, let users add and search tracks, and surfaced simple listening stats. This final version turns that playlist idea into a more complete applied AI system with retrieval, guardrails, evaluation, and portfolio-ready documentation.
 
-You do not need to understand everything at once. Approach the app as a curious investigator, work with an AI assistant to explain what you find, and make targeted improvements.
+## Why it matters
 
----
+The app demonstrates a practical AI pattern: use retrieval before generation so the system stays tied to real data. Instead of inventing songs or making vague suggestions, the recommender searches a known catalog, ranks the best matches, and only then produces an explanation.
 
-## How the code is organized
+## Architecture overview
 
-### `app.py`  
+The system follows this flow:
 
-The Streamlit user interface. It handles things like:
+1. A user submits a natural-language prompt and optional preference settings.
+2. Guardrails validate the prompt and parse genres, scenes, moods, and target energy.
+3. The retriever ranks songs from `data/song_catalog.csv`.
+4. The explanation layer returns grounded reasons for each recommendation.
+5. The reliability tab and evaluation script test fixed prompts against expected results.
 
-- Showing and updating the mood profile  
-- Adding songs  
-- Displaying playlists  
-- Lucky pick  
-- Stats and history
+Mermaid source for the system diagram is in [assets/system_architecture.mmd](/Users/admin/ai110/applied-ai-system-project/assets/system_architecture.mmd), and the rendered submission image is already saved as [assets/system_architecture.png](/Users/admin/ai110/applied-ai-system-project/assets/system_architecture.png). If you want to revise the chart later, Mermaid Live Editor is still a convenient way to re-export the PNG.
 
-### `playlist_logic.py`  
+![System Architecture](assets/system_architecture.png)
 
-The logic behind the app, including:
+## Repository structure
 
-- Normalizing and classifying songs  
-- Building playlists  
-- Merging playlist data  
-- Searching  
-- Computing statistics  
-- Lucky pick mechanics
+```text
+applied-ai-system-project/
+├── assets/
+├── data/
+├── src/
+├── tests/
+├── app.py
+├── model_card.md
+├── README.md
+└── requirements.txt
+```
 
-You will need to look at both files to understand how the app behaves.
+## Setup instructions
 
----
+1. Install dependencies:
 
-## What you will do
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 1. Explore the app  
+2. Optional: add an OpenAI API key if you want the app to generate a short grounded summary on top of the retrieved songs:
 
-Run the app and try things out:
+   ```bash
+   export OPENAI_API_KEY=your_key_here
+   ```
 
-- Add several songs with different titles, artists, genres, and energy levels  
-- Change the mood profile  
-- Use the search box  
-- Try the lucky pick  
-- Inspect the playlist tabs and stats  
-- Look at the history  
+3. Start the app:
 
-As you explore, write down at least five things that feel confusing, inconsistent, or strange. These might be bugs, quirks, or unexpected design decisions.
+   ```bash
+   streamlit run app.py
+   ```
 
-### 2. Ask AI for help understanding the code  
+4. Run the automated checks:
 
-Pick one issue from your list. Use an AI coding assistant to:
+   ```bash
+   python3 -m unittest discover -s tests
+   python3 -m src.evaluation
+   ```
 
-- Explain the relevant code sections  
-- Walk through what the code is supposed to do  
-- Suggest reasons the behavior might not match expectations  
+## Sample interactions
 
-For example:
+- Input: `I need calm piano music for late-night studying.`
+  Output: `Clair de Lune`, `Gymnopedie No. 1`, and `Lo-fi Rain`.
+  Why it worked: the retriever matched low energy, piano, study, and late-night signals.
 
-> "Here is the function that classifies songs. The app is mislabeling some songs. Help me understand what the function is doing and where the logic might need adjustment."
+- Input: `Give me high-energy dance pop for a party.`
+  Output: `Uptown Funk`, `Blinding Lights`, and `Levitating`.
+  Why it worked: the query strongly matched pop, dance, party, and high-energy cues.
 
-Before making changes, summarize in your own words what you think is happening.
+- Input: `Need moody synth music for a night drive.`
+  Output: `Night Drive`, `Midnight City`, and `Strobe`.
+  Why it worked: the retriever picked up electronic, synth, night, and drive concepts.
 
-### 3. Fix at least four issues  
+## Design decisions
 
-Make improvements based on your investigation.
+- I chose retrieval-augmented recommendation because it fits a music catalog naturally and keeps the output grounded in real songs.
+- The retriever uses a structured CSV catalog plus transparent scoring rules instead of hidden heuristics, which makes testing easier.
+- The explanation layer has two modes: a local deterministic summary for reproducibility and an optional OpenAI summary for a more natural response.
+- I added an evaluation harness because recommendation systems can feel plausible even when they are wrong, so the repo needed measurable checks.
 
-For each fix:
+## Testing summary
 
-- Identify the source of the issue  
-- Decide whether to accept or adjust the AI assistant's suggestions  
-- Update the code  
-- Add a short comment describing the fix  
+- `python3 -m unittest discover -s tests` passed all 4 unit tests.
+- `python3 -m src.evaluation` passed 3 out of 3 evaluation cases.
+- The local test environment did not exercise a live OpenAI call because no API key was configured, so the LLM explanation path remains lightly tested compared with the retrieval path.
 
-Your fixes may involve logic, calculations, search behavior, playlist grouping, lucky pick behavior, or anything else you discover.
+## Reflection
 
-### 4. Test your changes  
+This project taught me that useful AI systems need more than a prompt box. The strongest improvement came from making retrieval, guardrails, and evaluation explicit so the recommender could explain itself and be checked against expected behavior. It also reinforced that a smaller grounded system is often more trustworthy than a bigger system that sounds confident but cannot show where its answer came from.
 
-After each fix, try interacting with the app again:
+## Ethics and limitations
 
-- Add new songs  
-- Change the profile  
-- Try search and stats  
-- Check whether playlists behave more consistently  
+The catalog is small, hand-curated, and English-centered, so the system reflects those biases. It can only recommend what exists in the dataset, and its keyword-driven retrieval may miss subtle preferences, newer genres, or culturally specific language. To reduce misuse, the app blocks empty or low-information prompts, keeps recommendations tied to catalog entries, and exposes retrieval evidence rather than pretending the answer came from nowhere.
 
-Confirm that the behavior matches your expectations.
+## Portfolio artifact
 
-### 5. Optional stretch goals  
+This project shows me as an AI engineer who cares about grounded behavior, not just flashy output. I focused on building a system that can explain what it retrieved, expose its confidence, and measure whether it is actually meeting the user request.
 
-If you finish early or want an extra challenge, try one of these:
+## Demo walkthrough
 
-- Improve search behavior  
-- Add a "Recently added" view  
-- Add sorting controls  
-- Improve how Mixed songs are handled  
-- Add new features to the history view  
-- Introduce better error handling for empty playlists  
-- Add a new playlist category of your own design  
+Loom link: `[replace with your Loom walkthrough URL]`
 
----
+Record the walkthrough in this order:
 
-## Tips for success
-
-- You do not need to solve everything. Focus on exploring and learning.  
-- When confused, ask an AI assistant to explain the code or summarize behavior.  
-- Test the app often. Small experiments reveal useful clues.  
-- Treat surprising behavior as something worth investigating.  
-- Stay curious. The unpredictability is intentional and part of the experience.
-
-When you finish, Playlist Chaos will feel more predictable, and you will have taken your first steps into AI-assisted debugging.
+1. Enter a study-focused prompt and show the retrieved songs plus explanation.
+2. Enter a party or night-drive prompt and show how the output changes.
+3. Open the retrieval trace so viewers can see why songs were selected.
+4. Run the reliability tab evaluation suite and show the pass results.

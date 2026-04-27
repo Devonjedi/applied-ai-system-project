@@ -1,0 +1,10 @@
+flowchart LR
+    A[User prompt and preferences] --> B[Streamlit app]
+    B --> C[Guardrails and query parsing]
+    C --> D[Retriever and ranker]
+    H[(song_catalog.csv)] --> D
+    D --> E[Grounded explanation layer]
+    E --> F[Recommended songs and reasons]
+    D --> G[Evaluation suite]
+    F --> I[Human review]
+    I --> G
