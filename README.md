@@ -18,7 +18,7 @@ The system follows this flow:
 4. The explanation layer returns grounded reasons for each recommendation.
 5. The reliability tab and evaluation script test fixed prompts against expected results.
 
-Mermaid source for the system diagram is in [assets/system_architecture.mmd](/Users/admin/ai110/applied-ai-system-project/assets/system_architecture.mmd), and the rendered submission image is already saved as [assets/system_architecture.png](/Users/admin/ai110/applied-ai-system-project/assets/system_architecture.png). If you want to revise the chart later, Mermaid Live Editor is still a convenient way to re-export the PNG.
+Mermaid source for the system diagram is in [assets/system_architecture.mmd](assets/system_architecture.mmd), and the rendered submission image is saved as [assets/system_architecture.png](assets/system_architecture.png).
 
 ![System Architecture](assets/system_architecture.png)
 
@@ -106,9 +106,4 @@ This project shows me as an AI engineer who cares about grounded behavior, not j
 
 Loom link: `[replace with your Loom walkthrough URL]`
 
-Record the walkthrough in this order:
-
-1. Enter a study-focused prompt and show the retrieved songs plus explanation.
-2. Enter a party or night-drive prompt and show how the output changes.
-3. Open the retrieval trace so viewers can see why songs were selected.
-4. Run the reliability tab evaluation suite and show the pass results.
+![SignalFlow demo](CapstoneGifSignalFlow.gif)
