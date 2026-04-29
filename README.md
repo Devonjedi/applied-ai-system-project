@@ -104,6 +104,4 @@ This project shows me as an AI engineer who cares about grounded behavior, not j
 
 ## Demo walkthrough
 
-Loom link: `[replace with your Loom walkthrough URL]`
-
 ![SignalFlow demo](CapstoneGifSignalFlow.gif)
